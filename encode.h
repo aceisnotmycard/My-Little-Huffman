@@ -15,12 +15,12 @@ int fwrite_header(Header *header, FILE *file);
 
 
 //Converting tree to string
-void write_tree(Node *head, char **buffer);
+void write_tree(Node *head, char **buffer, int *size);
 
 
 //Writing sigle symbol to file
 //Don't forget about crc32
-int fwrite_symbol(Code symbol, FILE *file, char *byte, int *count, unsigned long long *size);
+int fwrite_symbol(Code symbol, FILE *file, char *byte, int *count, unsigned long long *size, uint32_t *crc);
 
 
 //Compressing filename to archivename
