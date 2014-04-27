@@ -40,8 +40,6 @@ int fread64(unsigned long long *variable, FILE *file) {
     }
     while(i != 8) {
         *variable |= (unsigned long long) buffer[i] << (8 * (7 - i));
-        printf("MEM %u\n", buffer[i] << (8 * (7 - i)));
-        printf("VAR %llu\n", *variable);
         i++;
     }
     return 0;
@@ -56,32 +54,27 @@ int fread_header(Header *header, FILE *file) {
     unsigned long long *filesize = malloc(sizeof(unsigned long long));
     char *filename;
     char *tree;
-    fprintf(stderr, "\n------------\n");
-    fprintf(stderr, "%lu\n", ftell(file));
+
     if(fread32(namesize, file)) {
         return 1;
     }
-    fprintf(stderr, "%lu\n", ftell(file));
     header->namesize = *namesize;
     filename = malloc(sizeof(char) * *namesize);
     fread(filename, sizeof(char), header->namesize, file);
     header->filename = filename;
-    fprintf(stderr, "%lu\n", ftell(file));
+
     if(fread16(treesize, file)) {
         return 1;
     }
     header->treesize = *treesize;
     tree = malloc(sizeof(char) * *treesize);
-    fprintf(stderr, "%lu\n", ftell(file));
     fread(tree, sizeof(char), header->treesize, file);
     header->tree = tree;
-    fprintf(stderr, "%lu\n", ftell(file));
     if(fread64(filesize, file)) {
         return 1;
     }
     header->filesize = *filesize;
-    fprintf(stderr, "%lu\n", ftell(file));
-    fprintf(stderr, "\n------------\n");
+
     return 0;
 }
 
@@ -102,14 +95,6 @@ void read_tree(Node **head, char **buffer) {
    }
 }
 
-void print_tree(Node *head) {
-    if(head != NULL) {
-        fprintf(stderr,"%c", head->ch);
-        print_tree(head->left);
-        print_tree(head->right);
-    }
-}
-
 int read_archive(FILE *archive, FILE *output) {
     unsigned long long i;
     Node *head = create_node(ALPHABET, 0);
@@ -118,15 +103,7 @@ int read_archive(FILE *archive, FILE *output) {
     Header *header = malloc(sizeof(Header));
     fread_header(header, archive);
 
-    printf("NAMESIZE %u\n", header->namesize);
-    printf("FILENAME %s\n", header->filename);
-    printf("TREESIZE %hu\n", header->treesize);
-    printf("%s\n", header->tree);
-    printf("\nFILESIZE %llu\n", header->filesize);
-
     read_tree(&head, &header->tree);
-    print_tree(head);
-    printf("\n");
 
     output = fopen(header->filename, "w");
 

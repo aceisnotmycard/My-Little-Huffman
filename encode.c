@@ -10,8 +10,6 @@ int fwrite_int(unsigned long long variable, int mode, FILE *file) {
         if (fwrite(&tmp, sizeof(char), 1, file) == EOF) {
             return 1;
         }
-        printf("MEM %u\n", tmp);
-        printf("VAR %llu\n", variable >> 8 * (mode - 1 - i));
         i++;
     }
     return 0;
@@ -19,34 +17,31 @@ int fwrite_int(unsigned long long variable, int mode, FILE *file) {
 
 
 int fwrite_header(Header *header, FILE *file) {
-    fprintf(stderr, "\n------------\n");
-    fprintf(stderr, "%lu\n", ftell(file));
+
     if (fwrite_int(header->namesize, 4 ,file)) {
         printf("cannot write namesize\n");
         return 1;
     }
-    fprintf(stderr, "%lu\n", ftell(file));
+
     if (fwrite(header->filename, sizeof(char), header->namesize, file) != header->namesize) {
         printf("cannot write filename\n");
         return 1;
     }
-    fprintf(stderr, "%lu\n", ftell(file));
+
     if (fwrite_int(header->treesize, 2, file)) {
         printf("cannot write treesize\n");
         return 1;
     }
-    fprintf(stderr, "%lu\n", ftell(file));
+
     if (fwrite(header->tree, sizeof(char), header->treesize, file) != header->treesize) {
         printf("cannot write tree\n");
         return 1;
     }
-    fprintf(stderr, "%lu\n", ftell(file));
+
     if (fwrite_int(header->filesize, 8, file)) {
         printf("cannot write filesize\n");
         return 1;
     }
-    fprintf(stderr, "%lu\n", ftell(file));
-    fprintf(stderr, "\n------------\n");
     return 0;
 }
 
@@ -142,12 +137,6 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     if (fwrite_header(header, archive)) {
     	return 1;
     }
-
-    printf("NAMESIZE %u\n", header->namesize);
-    printf("FILENAME %s\n", header->filename);
-    printf("TREESIZE %hu\n", header->treesize);
-    printf("%s\n", header->tree);
-    printf("\nFILESIZE %llu\n", header->filesize);
 
     fclose(file);
     fclose(archive);
