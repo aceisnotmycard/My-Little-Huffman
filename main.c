@@ -7,16 +7,18 @@ typedef enum {
 	ARCHIVE = 0,
 	LIST,
 	EXTRACT,
+	CHECK,
 	HELP
 } Mode;
 
 Mode parse_input(char *argument);
 
-const char* help_message =  "Usage: mylihaf -mode archive_name {files}\n" 
-		   					"modes:\n" 
-		   					"-a (archive)\n"
-		   					"-x (extract)\n"
-		   					"-l (list)\n";
+const char* help_message =  "Usage: mylihaf -mode archive_name {files}\n"
+		   				"modes:\n"
+		   				"-a (archive)\n"
+		   				"-x (extract)\n"
+		   				"-l (list)\n"
+						   "-t (check crc32 sum)\n";
 
 int main(int argc, char *argv[]) {
 
@@ -36,7 +38,7 @@ int main(int argc, char *argv[]) {
 	archivename = argv[2];
 	filename = argv[3];
 
-	
+
 	switch(parse_input(argv[1])) {
 		case ARCHIVE:
 			archive = fopen(archivename, "wb");
@@ -62,7 +64,7 @@ int main(int argc, char *argv[]) {
 			if(read_archive(archive, file)) {
 				printf("Cannot decode %s\n", archivename);
 			}
-			break;			
+			break;
 		case LIST:
 			archive = fopen(archivename, "rb");
 			if(archive == NULL) {
@@ -72,6 +74,19 @@ int main(int argc, char *argv[]) {
 			break;
 		case HELP:
 			fprintf(stderr, "%s", help_message);
+			break;
+
+		case CHECK:
+			archive = fopen(archivename, "rb");
+			if(archive == NULL) {
+				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
+				return 1;
+			}
+			if(check_crc(archive)) {
+				fprintf(stderr, "OK\n");
+			} else {
+				fprintf(stderr, "BROKEN\n");
+			}
 			break;
 		default:
 			fprintf(stderr, "Something went wrong.\n");
@@ -88,6 +103,9 @@ Mode parse_input(char *argument) {
 	}
 	if(!strcmp(argument, "-l")) {
 		return LIST;
+	}
+	if(!strcmp(argument, "-t")) {
+		return CHECK;
 	}
 	return HELP;
 }

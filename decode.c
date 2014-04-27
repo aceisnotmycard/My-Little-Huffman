@@ -52,6 +52,7 @@ int fread_header(Header *header, FILE *file) {
     unsigned int *namesize = malloc(sizeof(unsigned int));
     unsigned short *treesize = malloc(sizeof(unsigned short));
     unsigned long long *filesize = malloc(sizeof(unsigned long long));
+    uint32_t *crc = malloc(sizeof(uint32_t));
     char *filename;
     char *tree;
 
@@ -68,8 +69,15 @@ int fread_header(Header *header, FILE *file) {
     }
     header->treesize = *treesize;
     tree = malloc(sizeof(char) * *treesize);
+
     fread(tree, sizeof(char), header->treesize, file);
     header->tree = tree;
+
+    if(fread32(crc, file)) {
+        return 1;
+    }
+    header->crc = *crc;
+
     if(fread64(filesize, file)) {
         return 1;
     }
@@ -141,4 +149,32 @@ int read_archive(FILE *archive, FILE *output) {
     fclose(output);
     //remove(archivename);
     return 0;
+}
+
+int check_crc(FILE *archive) {
+    unsigned long long i;
+    int byte;
+    uint32_t crc = 0xFFFFFFFF;
+
+    Header *header = malloc(sizeof(Header));
+    fread_header(header, archive);
+
+    for(i = 0; i < header->filesize; i++) {
+        if(i % 8 == 0) {
+            fread(&byte, sizeof(char), 1, archive);
+            crc = crc32(crc, byte);
+            if(byte == EOF) {
+                return 1;
+            }
+        }
+
+        if ((int) 100 * (i+1)/header->filesize > (int) 100 * i/header->filesize) {
+            fprintf(stderr, ".");
+        }
+    }
+    fprintf(stderr, "\n");
+    fclose(archive);
+    fprintf(stderr, "ORIGINAL CRC SUM is %u \n", header->crc);
+    fprintf(stderr, "CALCULATED CRC SUM is %u \n", crc);
+    return crc == header->crc;
 }

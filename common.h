@@ -8,21 +8,17 @@
 //FILENAME
 //TREESIZE
 //TREE
-//!!!CRC
+//CRC
 //FILESIZE
 typedef struct {
 	unsigned short int treesize;
 	unsigned long long filesize;
-    //uint32_t crc;
+    uint32_t crc;
 	unsigned int namesize;
 	char *filename;
 	char *tree;
 } Header;
 
-
-typedef enum {
-	CANNOT_READ_NAMESIZE = 1
-} ERROR;
 
 //Mask for binary codes
 static char TAB[] = {
@@ -38,6 +34,6 @@ static char TAB[] = {
 
 
 
-uint32_t crc32(uint32_t crc, char buf);
+uint32_t crc32(uint32_t crc, unsigned char buf);
 
 #endif

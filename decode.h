@@ -30,4 +30,6 @@ int read_symbols(FILE *archive, FILE *output, Node *head, unsigned long long siz
 //Assuming that archive is correct
 int read_archive(FILE *archive, FILE *output);
 
+//Checking crc32 sum of array
+int check_crc(FILE *archive);
 #endif

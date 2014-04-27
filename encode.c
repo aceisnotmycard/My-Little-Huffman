@@ -18,27 +18,32 @@ int fwrite_int(unsigned long long variable, int mode, FILE *file) {
 
 int fwrite_header(Header *header, FILE *file) {
 
-    if (fwrite_int(header->namesize, 4 ,file)) {
+    if(fwrite_int(header->namesize, 4 ,file)) {
         printf("cannot write namesize\n");
         return 1;
     }
 
-    if (fwrite(header->filename, sizeof(char), header->namesize, file) != header->namesize) {
+    if(fwrite(header->filename, sizeof(char), header->namesize, file) != header->namesize) {
         printf("cannot write filename\n");
         return 1;
     }
 
-    if (fwrite_int(header->treesize, 2, file)) {
+    if(fwrite_int(header->treesize, 2, file)) {
         printf("cannot write treesize\n");
         return 1;
     }
 
-    if (fwrite(header->tree, sizeof(char), header->treesize, file) != header->treesize) {
+    if(fwrite(header->tree, sizeof(char), header->treesize, file) != header->treesize) {
         printf("cannot write tree\n");
         return 1;
     }
 
-    if (fwrite_int(header->filesize, 8, file)) {
+    if(fwrite_int(header->crc, 4, file)) {
+        printf("cannot write crc\n");
+        return 1;
+    }
+
+    if(fwrite_int(header->filesize, 8, file)) {
         printf("cannot write filesize\n");
         return 1;
     }
@@ -114,6 +119,7 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     header->filename = filename;
     header->tree = buffer;
     header->treesize = length;
+    header->crc = 0;
     header->filesize = 0;
 
     if (fwrite_header(header, archive)) {
@@ -132,6 +138,7 @@ int write_file(FILE *file, char *filename, FILE *archive) {
         crc = crc32(crc, byte);
         size += 7 - (count);
     }
+    header->crc = crc;
     header->filesize = size;
     fseek(archive, 0, SEEK_SET);
     if (fwrite_header(header, archive)) {

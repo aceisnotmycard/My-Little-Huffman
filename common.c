@@ -46,6 +46,7 @@ static uint32_t crc32_tab[] = {
     0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-uint32_t crc32(uint32_t crc, char buf) {
-    return 0;
+uint32_t crc32(uint32_t crc, unsigned char buf) {
+    crc = (crc >> 8) ^ crc32_tab[(crc ^ buf) & 0xFF];
+    return crc ^ 0xFFFFFFFF;
 }
