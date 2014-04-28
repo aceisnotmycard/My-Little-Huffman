@@ -3,6 +3,9 @@
 
 #include "decode.h"
 
-void list(FILE *file);
+
+//Show archive's content.
+//Return 0 if everything is OK.
+int list(FILE *file);
 
 #endif

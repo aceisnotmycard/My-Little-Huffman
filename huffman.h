@@ -25,7 +25,7 @@ typedef struct Node {
 
 
 //Structure that holding symbol's codes
-//Based on frequency
+// Based on frequency
 typedef struct Code {
 	char code[MAX_CODE_SIZE];
 	int size;
@@ -48,7 +48,7 @@ Node *make_list(size_t *table);
 Node *make_tree(Node *current);
 
 
-//Making binary codes 
+//Making binary codes
 void create_coding_table(Node *node, char *prev, Code *table);
 
 

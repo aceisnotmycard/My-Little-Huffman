@@ -107,8 +107,7 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     Header *header = malloc(sizeof(Header));
 
     Node *head = create_huffman_tree(file);
-    //printtree(head);
-    //printf("\n");
+
     Code table[ALPHABET] = {0,0};
     create_coding_table(head, "", table);
     char *buffer = malloc(sizeof(char) * TREE_HEIGHT * ALPHABET);
@@ -144,8 +143,5 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     if (fwrite_header(header, archive)) {
     	return 1;
     }
-
-    fclose(file);
-    fclose(archive);
     return 0;
 }

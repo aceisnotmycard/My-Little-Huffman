@@ -121,6 +121,3 @@ Node *create_huffman_tree(FILE *file) {
 
 	return make_huffman_tree(head);
 }
-
-
-

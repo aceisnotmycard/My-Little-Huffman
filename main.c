@@ -1,6 +1,5 @@
 #include <sys/stat.h>
-#include "encode.h"
-#include "decode.h"
+#include "io.h"
 
 
 typedef enum {
@@ -27,6 +26,10 @@ int main(int argc, char *argv[]) {
 	char *filename;
 	FILE *archive;
 	FILE *file;
+	FILE *tmp;
+	int fd = -1;
+	int i;
+	char tmp_name[] = "TMP_ARCHIVE_XXXXXX";
 
 	//Should be mode and archive's name at least.
 	if(argc < 3) {
@@ -34,25 +37,56 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-
 	archivename = argv[2];
-	filename = argv[3];
-
 
 	switch(parse_input(argv[1])) {
 		case ARCHIVE:
-			archive = fopen(archivename, "wb");
-			if(archive == NULL) {
-				fprintf(stderr, "Cannot open %s for writing.\n", archivename);
-				return 1;
-			}
-			file = fopen(filename, "r");
-			if(file == NULL) {
-				printf("Cannot open %s for reading.\n", filename);
-				return 1;
-			}
-			if(write_file(file, filename, archive)) {
-				printf("Cannot archive %s.\n", filename);
+			for(i = 3; i < argc; i++) {
+				fd = mkstemp(tmp_name);
+				if(fd == -1) {
+					fprintf(stderr, "Cannot create tmp file.\n");
+					return 1;
+				}
+
+				tmp = fdopen(fd, "w+b");
+
+				file = fopen(argv[i], "r");
+				if(file == NULL) {
+					fprintf(stderr, "Cannot open %s for reading.\n", argv[i]);
+					return 1;
+				}
+
+				if(write_file(file, argv[i], tmp)) {
+					fprintf(stderr, "Cannot archive %s.", argv[i]);
+					return 1;
+				}
+
+				if(i == 3 && stat(archivename, &buffer)) {
+					archive = fopen(archivename, "w+b");
+					if(archive == NULL) {
+						fprintf(stderr, "Cannot open %s for writing.\n", archivename);
+						return 1;
+					}
+					rename(tmp_name, archivename);
+				} else {
+					archive = fopen(archivename, "r+b");
+					if(archive == NULL) {
+						fprintf(stderr, "Cannot open %s for writing.\n", archivename);
+						return 1;
+					}
+					switch(add_to_archive(tmp, archive)) {
+						case -1:
+							remove(tmp_name);
+							break;
+						case 0:
+							remove(archivename);
+							rename(tmp_name, archivename);
+							break;
+						case 1:
+							return 1;
+							break;
+					}
+				}
 			}
 			break;
 		case EXTRACT:
@@ -61,16 +95,20 @@ int main(int argc, char *argv[]) {
 				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
 				return 1;
 			}
-			if(read_archive(archive, file)) {
-				printf("Cannot decode %s\n", archivename);
+			for(i = 3; i < argc; i++) {
+				if(extract_from_archive(argv[i], archive)) {
+					fprintf(stderr, "Cannot extract %s.\n", argv[i]);
+					return 1;
+				}
 			}
 			break;
 		case LIST:
 			archive = fopen(archivename, "rb");
 			if(archive == NULL) {
 				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
+				return 1;
 			}
-			fprintf(stderr, "LIST %s\n", archivename);
+			list(archive);
 			break;
 		case HELP:
 			fprintf(stderr, "%s", help_message);

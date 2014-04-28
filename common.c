@@ -50,3 +50,9 @@ uint32_t crc32(uint32_t crc, unsigned char buf) {
     crc = (crc >> 8) ^ crc32_tab[(crc ^ buf) & 0xFF];
     return crc ^ 0xFFFFFFFF;
 }
+
+void show_progress(unsigned long long i, unsigned long long size) {
+    if ((int) 100 * (i+1)/size > (int) 100 * i/size) {
+        fprintf(stderr, ".");
+    }
+}

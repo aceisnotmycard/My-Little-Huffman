@@ -103,13 +103,16 @@ void read_tree(Node **head, char **buffer) {
    }
 }
 
-int read_archive(FILE *archive, FILE *output) {
+int read_archive(FILE *archive, FILE *output, Header *header) {
     unsigned long long i;
     Node *head = create_node(ALPHABET, 0);
     int byte;
 
-    Header *header = malloc(sizeof(Header));
-    fread_header(header, archive);
+    // Header *header = malloc(sizeof(Header));
+    // fread_header(header, archive);
+
+    //fprintf(stderr, "%s", header->filename);
+    //fprintf(stderr, "%s", header->namesize);
 
     read_tree(&head, &header->tree);
 
@@ -138,43 +141,8 @@ int read_archive(FILE *archive, FILE *output) {
             fwrite(&current->ch, sizeof(char), 1, output);
             current = head;
         }
-
-        //Showing progress
-        if ((int) 100 * (i+1)/header->filesize > (int) 100 * i/header->filesize) {
-            fprintf(stderr, ".");
-        }
+        show_progress(i, header->filesize);
     }
     fprintf(stderr, "\n");
-    fclose(archive);
-    fclose(output);
-    //remove(archivename);
     return 0;
-}
-
-int check_crc(FILE *archive) {
-    unsigned long long i;
-    int byte;
-    uint32_t crc = 0xFFFFFFFF;
-
-    Header *header = malloc(sizeof(Header));
-    fread_header(header, archive);
-
-    for(i = 0; i < header->filesize; i++) {
-        if(i % 8 == 0) {
-            fread(&byte, sizeof(char), 1, archive);
-            crc = crc32(crc, byte);
-            if(byte == EOF) {
-                return 1;
-            }
-        }
-
-        if ((int) 100 * (i+1)/header->filesize > (int) 100 * i/header->filesize) {
-            fprintf(stderr, ".");
-        }
-    }
-    fprintf(stderr, "\n");
-    fclose(archive);
-    fprintf(stderr, "ORIGINAL CRC SUM is %u \n", header->crc);
-    fprintf(stderr, "CALCULATED CRC SUM is %u \n", crc);
-    return crc == header->crc;
 }
