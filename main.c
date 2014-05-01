@@ -50,12 +50,11 @@ int main(int argc, char *argv[]) {
 
 				tmp = fdopen(fd, "w+b");
 
-				file = fopen(argv[i], "r");
+				file = fopen(argv[i], "rb");
 				if(file == NULL) {
 					fprintf(stderr, "Cannot open %s for reading.\n", argv[i]);
 					return 1;
 				}
-
 				if(write_file(file, argv[i], tmp)) {
 					fprintf(stderr, "Cannot archive %s.", argv[i]);
 					return 1;
@@ -123,7 +122,7 @@ int main(int argc, char *argv[]) {
 			if(check_crc(archive)) {
 				fprintf(stderr, "OK\n");
 			} else {
-				fprintf(stderr, "BROKEN\n");
+				fprintf(stderr, "DAMAGED\n");
 			}
 			break;
 		default:

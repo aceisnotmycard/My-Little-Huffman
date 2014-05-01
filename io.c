@@ -2,7 +2,7 @@
 
 int check_crc(FILE *archive) {
 	unsigned long long i;
-	int byte;
+	unsigned int byte;
 	uint32_t crc = 0xFFFFFFFF;
 
 	Header *header = malloc(sizeof(Header));
@@ -25,8 +25,9 @@ int check_crc(FILE *archive) {
 
 int add_to_archive(FILE *tmp, FILE *archive) {
 	unsigned long long i;
-	int byte;
+	unsigned int byte;
 	unsigned long long bytes;
+	unsigned long long tmp_bytes;
 	fseek(tmp, 0, SEEK_SET);
 	fseek(archive, 0, SEEK_SET);
 	Header *tmp_header = malloc(sizeof(Header));
@@ -36,18 +37,23 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 		fprintf(stderr, "Cannot read header from tmp.\n");
 		return 1;
 	}
-	fseek(tmp, 0, SEEK_END);
+	tmp_bytes = tmp_header->filesize / 8 + (tmp_header->filesize % 8 != 0);
+	fseek(tmp, tmp_bytes, SEEK_CUR);
 	while(!fread_header(archive_header, archive)) {
 		bytes = archive_header->filesize / 8 + (archive_header->filesize % 8 != 0);
+
 		if(strcmp(archive_header->filename, tmp_header->filename)) {
 			fwrite_header(archive_header, tmp);
-			for(i = 0; i < archive_header->filesize; i++) {
-				if(i % 8 == 0) {
-					fread(&byte, sizeof(char), 1, archive);
-					if(byte == EOF) {
-						return 1;
-					}
-					fwrite(&byte, sizeof(char), 1, tmp);
+
+			for(i = 0; i < bytes; i++) {
+				if(fread(&byte, sizeof(char), 1, archive) != 1) {
+					fprintf(stderr, "Cannot write %s to tmp", tmp_header->filename);
+					return 1;
+				}
+				//Maybe EOF here?
+				if(fwrite(&byte, sizeof(char), 1, tmp) != 1) {
+					fprintf(stderr, "Cannot write %s to tmp", tmp_header->filename);
+					return 1;
 				}
 			}
 		} else {
@@ -69,6 +75,7 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 }
 
 int extract_from_archive(char *name, FILE *archive) {
+	fprintf(stderr, "Extracting %s...\n", name);
 	fseek(archive, 0, SEEK_SET);
 	FILE *file;
 	Header *header = malloc(sizeof(Header));

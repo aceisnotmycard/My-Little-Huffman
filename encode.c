@@ -1,4 +1,5 @@
 #include "encode.h"
+#include <sys/stat.h>
 
 
 //Universal function to write unsigned short, int and long long
@@ -79,6 +80,7 @@ int fwrite_symbol(Code symbol, FILE *file, char *byte, int *count, unsigned long
             if(fwrite(byte, 1, 1, file) != 1) {
             	return 1;
             }
+            //fprintf(stderr, "%d\n", *byte);
             *crc = crc32(*crc, *byte);
             *count = 7;
             *byte = 0;
@@ -88,21 +90,19 @@ int fwrite_symbol(Code symbol, FILE *file, char *byte, int *count, unsigned long
     return 0;
 }
 
-void printtree(Node *head) {
-    if(head != NULL) {
-        fprintf(stderr,"%c", head->ch);
-        printtree(head->left);
-        printtree(head->right);
-    }
-}
-
 int write_file(FILE *file, char *filename, FILE *archive) {
     int ch;
     int length = 0;
     unsigned long long size = 0;
+    unsigned long long i = 0;
+    unsigned long long original_size;
     int count = 7;
     char byte = 0;
     uint32_t crc = 0xFFFFFFFF;
+    struct stat buf;
+
+    if(!stat(filename, &buf))
+        original_size = buf.st_size;
 
     Header *header = malloc(sizeof(Header));
 
@@ -129,6 +129,7 @@ int write_file(FILE *file, char *filename, FILE *archive) {
         if(fwrite_symbol(table[ch], archive, &byte, &count, &size, &crc)) {
         	return 1;
         }
+        show_progress(i++, original_size);
     }
     if(count != 7) {
         if(fwrite(&byte, 1, 1, archive) != 1) {
@@ -137,11 +138,15 @@ int write_file(FILE *file, char *filename, FILE *archive) {
         crc = crc32(crc, byte);
         size += 7 - (count);
     }
+    fprintf(stderr, "\n");
+
     header->crc = crc;
     header->filesize = size;
     fseek(archive, 0, SEEK_SET);
     if (fwrite_header(header, archive)) {
     	return 1;
     }
+    //fprintf(stderr, "%s\n", header->tree);
+    //fprintf(stderr, "%llu\n", header->filesize);
     return 0;
 }

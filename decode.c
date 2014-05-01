@@ -103,20 +103,27 @@ void read_tree(Node **head, char **buffer) {
    }
 }
 
+void print_tree(Node *head) {
+    if(head != NULL) {
+        fprintf(stderr, "%c", head->ch);
+        print_tree(head->left);
+        print_tree(head->right);
+    }
+}
+
 int read_archive(FILE *archive, FILE *output, Header *header) {
     unsigned long long i;
     Node *head = create_node(ALPHABET, 0);
-    int byte;
+    char byte;
 
-    // Header *header = malloc(sizeof(Header));
-    // fread_header(header, archive);
-
-    //fprintf(stderr, "%s", header->filename);
-    //fprintf(stderr, "%s", header->namesize);
+    //fprintf(stderr, "%s\n", header->tree);
+    //fprintf(stderr, "%llu\n", header->filesize);
 
     read_tree(&head, &header->tree);
 
-    output = fopen(header->filename, "w");
+    //print_tree(head);
+
+    output = fopen(header->filename, "wb");
 
     if(output == NULL) {
         return 1;
@@ -126,16 +133,21 @@ int read_archive(FILE *archive, FILE *output, Header *header) {
     for(i = 0; i < header->filesize; i++) {
         if(i % 8 == 0) {
             fread(&byte, sizeof(char), 1, archive);
-            if(byte == EOF) {
-                return 1;
-            }
+            //fprintf(stderr, "%d\n", byte);
+            //if(byte == EOF) {
+            //    fprintf(stderr, "EOF BYTE %d\n", byte);
+                // return 1;
+            // }
         }
         if(byte & TAB[7 - (i % 8)]) {
             current = current->right;
         } else {
             current = current->left;
         }
-        if(current == NULL) return 1;
+        if(current == NULL) {
+            fprintf(stderr, "Damaged tree\n");
+            return 1;
+        }
 
         if(current->ch < ALPHABET) {
             fwrite(&current->ch, sizeof(char), 1, output);
