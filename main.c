@@ -86,6 +86,8 @@ int main(int argc, char *argv[]) {
 							break;
 					}
 				}
+				fclose(archive);
+				fclose(tmp);
 			}
 			break;
 		case EXTRACT:
@@ -94,9 +96,16 @@ int main(int argc, char *argv[]) {
 				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
 				return 1;
 			}
-			for(i = 3; i < argc; i++) {
-				if(extract_from_archive(argv[i], archive)) {
-					fprintf(stderr, "Cannot extract %s.\n", argv[i]);
+			if (argc > 3) {
+				for(i = 3; i < argc; i++) {
+					if(extract_from_archive(argv[i], archive)) {
+						fprintf(stderr, "Cannot extract %s.\n", argv[i]);
+						return 1;
+					}
+				}
+			} else {
+				if(extract_all(archive)) {
+					fprintf(stderr, "Cannot extract %s.\n", archivename);
 					return 1;
 				}
 			}
@@ -119,11 +128,7 @@ int main(int argc, char *argv[]) {
 				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
 				return 1;
 			}
-			if(check_crc(archive)) {
-				fprintf(stderr, "OK\n");
-			} else {
-				fprintf(stderr, "DAMAGED\n");
-			}
+			check_crc(archive);
 			break;
 		default:
 			fprintf(stderr, "Something went wrong.\n");

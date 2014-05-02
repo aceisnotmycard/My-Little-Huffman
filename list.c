@@ -10,6 +10,5 @@ int list(FILE *archive) {
 		fprintf(stderr, "SIZE: %llu bytes\n", bytes);
 
 		fseek(archive, bytes, SEEK_CUR);
-
 	}
 }

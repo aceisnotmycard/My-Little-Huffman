@@ -1,31 +1,38 @@
 #include "io.h"
 
-int check_crc(FILE *archive) {
+void check_crc(FILE *archive) {
 	unsigned long long i;
 	unsigned int byte;
-	uint32_t crc = 0xFFFFFFFF;
+	uint32_t crc;
 
 	Header *header = malloc(sizeof(Header));
-	fread_header(header, archive);
-
-	for(i = 0; i < header->filesize; i++) {
-		if(i % 8 == 0) {
-			fread(&byte, sizeof(char), 1, archive);
-			crc = crc32(crc, byte);
-			if(byte == EOF) {
-				return 1;
+	while(!fread_header(header, archive)) {
+		crc = 0xFFFFFFFF;
+		fprintf(stderr, "Checking... %s\n", header->filename);
+		for(i = 0; i < header->filesize; i++) {
+			if(i % 8 == 0) {
+				fread(&byte, sizeof(char), 1, archive);
+				crc = crc32(crc, byte);
+				if(byte == EOF) {
+					fprintf(stderr, "ERROR\n");
+					return;
+				}
 			}
+			show_progress(i, header->filesize);
 		}
-		show_progress(i, header->filesize);
+		fprintf(stderr, "\n");
+		if (crc == header->crc) {
+			fprintf(stderr, "OK\n");
+		} else {
+			fprintf(stderr, "DAMAGED\n");
+		}
 	}
-	fprintf(stderr, "\n");
 	fclose(archive);
-	return crc == header->crc;
 }
 
 int add_to_archive(FILE *tmp, FILE *archive) {
 	unsigned long long i;
-	unsigned int byte;
+	int byte;
 	unsigned long long bytes;
 	unsigned long long tmp_bytes;
 	fseek(tmp, 0, SEEK_SET);
@@ -41,9 +48,12 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 	fseek(tmp, tmp_bytes, SEEK_CUR);
 	while(!fread_header(archive_header, archive)) {
 		bytes = archive_header->filesize / 8 + (archive_header->filesize % 8 != 0);
-
 		if(strcmp(archive_header->filename, tmp_header->filename)) {
 			fwrite_header(archive_header, tmp);
+
+			// while(fread(&byte, sizeof(char), 1, archive)) {
+			// 	fwrite(&byte, sizeof(char), 1, tmp);
+			// }
 
 			for(i = 0; i < bytes; i++) {
 				if(fread(&byte, sizeof(char), 1, archive) != 1) {
@@ -88,6 +98,19 @@ int extract_from_archive(char *name, FILE *archive) {
 			bytes = header->filesize / 8 + (header->filesize % 8 != 0);
 			fseek(archive, bytes, SEEK_CUR);
 		}
+	}
+	return 0;
+}
+
+int extract_all(FILE *archive) {
+	fseek(archive, 0, SEEK_SET);
+	FILE *file;
+	Header *header = malloc(sizeof(Header));
+	unsigned long long bytes;
+	while(!fread_header(header, archive)) {
+		fprintf(stderr, "Extracting %s...\n", header->filename);
+		if(read_archive(archive, file, header))
+			return 1;
 	}
 	return 0;
 }

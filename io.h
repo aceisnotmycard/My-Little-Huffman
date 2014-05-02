@@ -5,7 +5,7 @@
 #include "decode.h"
 
 //Checking crc32 sum of array
-int check_crc(FILE *archive);
+void check_crc(FILE *archive);
 
 //Adding new file to array.
 //Assuming that everything is ok.
