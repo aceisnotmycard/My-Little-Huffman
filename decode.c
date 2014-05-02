@@ -51,6 +51,7 @@ int fread_header(Header *header, FILE *file) {
     int i = 0;
     unsigned int *namesize = malloc(sizeof(unsigned int));
     unsigned short *treesize = malloc(sizeof(unsigned short));
+    unsigned long long *originalsize = malloc(sizeof(unsigned long long));
     unsigned long long *filesize = malloc(sizeof(unsigned long long));
     uint32_t *crc = malloc(sizeof(uint32_t));
     char *filename;
@@ -77,6 +78,11 @@ int fread_header(Header *header, FILE *file) {
         return 1;
     }
     header->crc = *crc;
+
+    if(fread64(originalsize, file)) {
+        return 1;
+    }
+    header->originalsize = *originalsize;
 
     if(fread64(filesize, file)) {
         return 1;

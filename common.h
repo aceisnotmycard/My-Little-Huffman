@@ -10,9 +10,11 @@
 //TREESIZE
 //TREE
 //CRC
+//ORIGINALSIZE
 //FILESIZE
 typedef struct {
 	unsigned short int treesize;
+	unsigned long long originalsize;
 	unsigned long long filesize;
     uint32_t crc;
 	unsigned int namesize;

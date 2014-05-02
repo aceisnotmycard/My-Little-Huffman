@@ -65,6 +65,7 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 					fprintf(stderr, "Cannot write %s to tmp", tmp_header->filename);
 					return 1;
 				}
+				show_progress(i, bytes);
 			}
 		} else {
 			fprintf(stderr, "Found file with same name (%s). Replace? (y/n)\n", tmp_header->filename);

@@ -44,6 +44,11 @@ int fwrite_header(Header *header, FILE *file) {
         return 1;
     }
 
+    if(fwrite_int(header->originalsize, 8, file)) {
+        printf("cannot write filesize\n");
+        return 1;
+    }
+
     if(fwrite_int(header->filesize, 8, file)) {
         printf("cannot write filesize\n");
         return 1;
@@ -119,6 +124,7 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     header->tree = buffer;
     header->treesize = length;
     header->crc = 0;
+    header->originalsize = original_size;
     header->filesize = 0;
 
     if (fwrite_header(header, archive)) {
