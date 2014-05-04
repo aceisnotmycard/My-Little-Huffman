@@ -14,11 +14,11 @@ Mode parse_input(char *argument);
 
 const char* help_message =  "Usage: mylihaf -mode archive_name {files}\n"
 		   				"modes:\n"
-		   				"-a (archive)\n"
-		   				"-x (extract)\n"
-		   				"-l (list)\n"
-						   "-t (check crc32 sum)\n"
-						   "-d (delete)";
+		   				"-a (archive) + 1 and more files\n"
+		   				"-x (extract) + 0 and more files\n"
+		   				"-l (list) + 0 files\n"
+						   "-t (check crc32 sum) + 0 files\n"
+						   "-d (delete) + 1 file";
 
 int main(int argc, char *argv[]) {
 
@@ -48,6 +48,12 @@ int main(int argc, char *argv[]) {
 			}
 
 			for(i = 3; i < argc; i++) {
+
+				if(strstr(argv[i], "/")) {
+						fprintf(stderr, "Cannot archive files from subdirectories.\n");
+						return 0;
+				}
+
 				fd = mkstemp(tmp_name);
 				if(fd == -1) {
 					fprintf(stderr, "Cannot create tmp file.\n");
