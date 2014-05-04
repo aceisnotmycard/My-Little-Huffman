@@ -132,12 +132,10 @@ int delete_from_archive(char *name, FILE *archive, FILE *tmp) {
 
 			for(i = 0; i < bytes; i++) {
 				if(fread(&byte, sizeof(char), 1, archive) != 1) {
-					fprintf(stderr, "Cannot write %s to tmp", header->filename);
 					return 1;
 				}
 				//Maybe EOF here?
 				if(fwrite(&byte, sizeof(char), 1, tmp) != 1) {
-					fprintf(stderr, "Cannot write %s to tmp", header->filename);
 					return 1;
 				}
 			}

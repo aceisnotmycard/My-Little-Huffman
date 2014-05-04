@@ -1,7 +1,6 @@
 #include <sys/stat.h>
 #include "io.h"
 
-
 typedef enum {
 	ARCHIVE = 0,
 	LIST,
@@ -43,6 +42,11 @@ int main(int argc, char *argv[]) {
 
 	switch(parse_input(argv[1])) {
 		case ARCHIVE:
+			if(argc == 3) {
+				fprintf(stderr, "%s", help_message);
+				return 0;
+			}
+
 			for(i = 3; i < argc; i++) {
 				fd = mkstemp(tmp_name);
 				if(fd == -1) {
@@ -113,6 +117,12 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		case LIST:
+
+			if(argc != 3) {
+				fprintf(stderr, "%s", help_message);
+				return 0;
+			}
+
 			archive = fopen(archivename, "rb");
 			if(archive == NULL) {
 				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
@@ -125,6 +135,12 @@ int main(int argc, char *argv[]) {
 			break;
 
 		case CHECK:
+
+			if(argc != 3) {
+				fprintf(stderr, "%s", help_message);
+				return 0;
+			}
+
 			archive = fopen(archivename, "rb");
 			if(archive == NULL) {
 				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
@@ -134,6 +150,12 @@ int main(int argc, char *argv[]) {
 			break;
 
 		case DELETE:
+			if(argc != 4) {
+				fprintf(stderr, "Sorry, you can delete only one file at same time.\n");
+				fprintf(stderr, "%s", help_message);
+				return 0;
+			}
+
 			fd = mkstemp(tmp_name);
 			if(fd == -1) {
 				fprintf(stderr, "Cannot create tmp file.\n");
