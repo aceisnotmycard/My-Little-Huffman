@@ -147,12 +147,21 @@ int main(int argc, char *argv[]) {
 				return 1;
 			}
 
-			if(delete_from_archive(argv[3], archive, tmp)) {
-				fprintf(stderr, "Cannot delete %s from %s.\n", argv[3], archivename);
-				remove(tmp_name);
-				fclose(tmp);
-				fclose(archive);
-				return 1;
+			switch(delete_from_archive(argv[3], archive, tmp)) {
+				case -1:
+					fprintf(stderr, "%s not found.\n", argv[3]);
+					break;
+
+				case 0:
+					fprintf(stderr, "Successfully deleted %s.\n", argv[3]);
+					break;
+				case 1:
+					fprintf(stderr, "Cannot delete %s from %s.\n", argv[3], archivename);
+					remove(tmp_name);
+					fclose(tmp);
+					fclose(archive);
+					return 1;
+					break;
 			}
 
 			remove(archivename);

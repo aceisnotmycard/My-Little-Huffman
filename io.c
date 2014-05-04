@@ -119,12 +119,14 @@ int delete_from_archive(char *name, FILE *archive, FILE *tmp) {
 	unsigned long long bytes;
 	unsigned long long i;
 	int byte;
+	int trigger = -1;
 
 	while(!fread_header(header, archive)) {
 		bytes = header->filesize / 8 + (header->filesize % 8 != 0);
 
 		if(!strcmp(name, header->filename)) {
 			fseek(archive, bytes, SEEK_CUR);
+			trigger = 0;
 		} else {
 			fwrite_header(header, tmp);
 
@@ -142,5 +144,5 @@ int delete_from_archive(char *name, FILE *archive, FILE *tmp) {
 		}
 	}
 
-	return 0;
+	return trigger;
 }
