@@ -7,6 +7,7 @@ typedef enum {
 	LIST,
 	EXTRACT,
 	CHECK,
+	DELETE,
 	HELP
 } Mode;
 
@@ -17,7 +18,8 @@ const char* help_message =  "Usage: mylihaf -mode archive_name {files}\n"
 		   				"-a (archive)\n"
 		   				"-x (extract)\n"
 		   				"-l (list)\n"
-						   "-t (check crc32 sum)\n";
+						   "-t (check crc32 sum)\n"
+						   "-d (delete)";
 
 int main(int argc, char *argv[]) {
 
@@ -130,6 +132,34 @@ int main(int argc, char *argv[]) {
 			}
 			check_crc(archive);
 			break;
+
+		case DELETE:
+			fd = mkstemp(tmp_name);
+			if(fd == -1) {
+				fprintf(stderr, "Cannot create tmp file.\n");
+				return 1;
+			}
+			tmp = fdopen(fd, "w+b");
+
+			archive = fopen(archivename, "rb");
+			if(archive == NULL) {
+				fprintf(stderr, "Cannot open %s for reading.\n", archivename);
+				return 1;
+			}
+
+			if(delete_from_archive(argv[3], archive, tmp)) {
+				fprintf(stderr, "Cannot delete %s from %s.\n", argv[3], archivename);
+				remove(tmp_name);
+				fclose(tmp);
+				fclose(archive);
+				return 1;
+			}
+
+			remove(archivename);
+			rename(tmp_name, archivename);
+			fclose(tmp);
+			fclose(archive);
+			break;
 		default:
 			fprintf(stderr, "Something went wrong.\n");
 	}
@@ -148,6 +178,9 @@ Mode parse_input(char *argument) {
 	}
 	if(!strcmp(argument, "-t")) {
 		return CHECK;
+	}
+	if(!strcmp(argument, "-d")) {
+		return DELETE;
 	}
 	return HELP;
 }

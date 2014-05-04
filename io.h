@@ -16,4 +16,10 @@ int add_to_archive(FILE *tmp, FILE *archive);
 
 int extract_from_archive(char *name, FILE *archive);
 
+
+int extract_all(FILE *archive);
+
+
+int delete_from_archive(char *name, FILE *archive, FILE *tmp);
+
 #endif

@@ -51,10 +51,6 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 		if(strcmp(archive_header->filename, tmp_header->filename)) {
 			fwrite_header(archive_header, tmp);
 
-			// while(fread(&byte, sizeof(char), 1, archive)) {
-			// 	fwrite(&byte, sizeof(char), 1, tmp);
-			// }
-
 			for(i = 0; i < bytes; i++) {
 				if(fread(&byte, sizeof(char), 1, archive) != 1) {
 					fprintf(stderr, "Cannot write %s to tmp", tmp_header->filename);
@@ -113,5 +109,38 @@ int extract_all(FILE *archive) {
 		if(read_archive(archive, file, header))
 			return 1;
 	}
+	return 0;
+}
+
+
+int delete_from_archive(char *name, FILE *archive, FILE *tmp) {
+	fseek(archive, 0 , SEEK_SET);
+	Header *header = malloc(sizeof(Header));
+	unsigned long long bytes;
+	unsigned long long i;
+	int byte;
+
+	while(!fread_header(header, archive)) {
+		bytes = header->filesize / 8 + (header->filesize % 8 != 0);
+
+		if(!strcmp(name, header->filename)) {
+			fseek(archive, bytes, SEEK_CUR);
+		} else {
+			fwrite_header(header, tmp);
+
+			for(i = 0; i < bytes; i++) {
+				if(fread(&byte, sizeof(char), 1, archive) != 1) {
+					fprintf(stderr, "Cannot write %s to tmp", header->filename);
+					return 1;
+				}
+				//Maybe EOF here?
+				if(fwrite(&byte, sizeof(char), 1, tmp) != 1) {
+					fprintf(stderr, "Cannot write %s to tmp", header->filename);
+					return 1;
+				}
+			}
+		}
+	}
+
 	return 0;
 }
