@@ -64,7 +64,6 @@ int fread_header(Header *header, FILE *file) {
     filename = malloc(sizeof(char) * *namesize);
     fread(filename, sizeof(char), header->namesize, file);
     header->filename = filename;
-
     if(fread16(treesize, file)) {
         return 1;
     }
