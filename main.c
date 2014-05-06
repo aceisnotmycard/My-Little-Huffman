@@ -48,11 +48,20 @@ int main(int argc, char *argv[]) {
 			}
 
 			for(i = 3; i < argc; i++) {
-
 				if(strstr(argv[i], "/")) {
 						fprintf(stderr, "Cannot archive files from subdirectories.\n");
-						return 0;
+						return 1;
 				}
+				if(stat(argv[i], &buffer)) {
+					fprintf(stderr, "Cannot open %s.\n", argv[i]);
+					return 1;
+				}
+				if(!S_ISREG(buffer.st_mode)) {
+					fprintf(stderr, "%s is not a regular file.\n", argv[i]);
+				}
+			}
+
+			for(i = 3; i < argc; i++) {
 
 				fd = mkstemp(tmp_name);
 				if(fd == -1) {
