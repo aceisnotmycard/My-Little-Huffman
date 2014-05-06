@@ -131,6 +131,7 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     	return 1;
     }
     fseek(file, 0, SEEK_SET);
+    fprintf(stderr, "Encoding file...");
     while((ch = fgetc(file)) != EOF) {
         if(fwrite_symbol(table[ch], archive, &byte, &count, &size, &crc)) {
         	return 1;
@@ -152,6 +153,7 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     if (fwrite_header(header, archive)) {
     	return 1;
     }
+    fprintf(stderr, "Done\n");
     //fprintf(stderr, "%s\n", header->tree);
     //fprintf(stderr, "%llu\n", header->filesize);
     return 0;

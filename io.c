@@ -50,7 +50,7 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 		bytes = archive_header->filesize / 8 + (archive_header->filesize % 8 != 0);
 		if(strcmp(archive_header->filename, tmp_header->filename)) {
 			fwrite_header(archive_header, tmp);
-
+			fprintf(stderr, "Merging files...");
 			for(i = 0; i < bytes; i++) {
 				if(fread(&byte, sizeof(char), 1, archive) != 1) {
 					fprintf(stderr, "Cannot write %s to tmp", tmp_header->filename);
@@ -63,6 +63,7 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 				}
 				show_progress(i, bytes);
 			}
+			fprintf(stderr, "Done\n");
 		} else {
 			fprintf(stderr, "Found file with same name (%s). Replace? (y/n)\n", tmp_header->filename);
 			byte = 0;

@@ -117,7 +117,8 @@ void create_coding_table(Node *node, char *prev, Code *table) {
 
 
 Node *create_huffman_tree(FILE *file) {
+	fprintf(stderr, "Preparing file...");
 	Node *head = make_list(count_frequency(file));
-
+	fprintf(stderr, "Done\n");
 	return make_huffman_tree(head);
 }

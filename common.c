@@ -52,7 +52,7 @@ uint32_t crc32(uint32_t crc, unsigned char buf) {
 }
 
 void show_progress(unsigned long long i, unsigned long long size) {
-    if ((int) 100 * (i+1)/size > (int) 100 * i/size) {
+    if ((int) 80 * (i+1)/size > (int) 80 * i/size) {
         fprintf(stderr, ".");
     }
 }

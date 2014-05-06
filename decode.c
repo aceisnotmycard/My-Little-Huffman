@@ -139,11 +139,6 @@ int read_archive(FILE *archive, FILE *output, Header *header) {
     for(i = 0; i < header->filesize; i++) {
         if(i % 8 == 0) {
             fread(&byte, sizeof(char), 1, archive);
-            //fprintf(stderr, "%d\n", byte);
-            //if(byte == EOF) {
-            //    fprintf(stderr, "EOF BYTE %d\n", byte);
-                // return 1;
-            // }
         }
         if(byte & TAB[7 - (i % 8)]) {
             current = current->right;
