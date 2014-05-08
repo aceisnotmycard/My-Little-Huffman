@@ -105,20 +105,22 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     char byte = 0;
     uint32_t crc = 0xFFFFFFFF;
     struct stat buf;
+    Code table[ALPHABET] = {0,0};
+    char *buffer = calloc(TREE_HEIGHT * ALPHABET, sizeof(char));
+    char *p = buffer;
 
     if(!stat(filename, &buf))
         original_size = buf.st_size;
 
+    Node *head = create_huffman_tree(file);
     Header *header = malloc(sizeof(Header));
 
-    Node *head = create_huffman_tree(file);
+    //fprintf(stderr, "Error is not here\n");
 
-    Code table[ALPHABET] = {0,0};
-    create_coding_table(head, "", table);
-    char *buffer = malloc(sizeof(char) * TREE_HEIGHT * ALPHABET);
-    char *p = buffer;
-    write_tree(head, &p, &length);
-
+    if(head) {
+        create_coding_table(head, "", table);
+        write_tree(head, &p, &length);
+    }
     header->namesize = strlen(filename);
     header->filename = filename;
     header->tree = buffer;
@@ -127,8 +129,12 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     header->originalsize = original_size;
     header->filesize = 0;
 
+
+
     //fprintf(stderr, "filename: %s\n", header->filename);
     //fprintf(stderr, "namesize: %d\n", header->namesize);
+    //fprintf(stderr, "tree: %s\n", header->tree);
+    // fprintf(stderr, "filesize: %llu\n", header->filesize);
 
     if (fwrite_header(header, archive)) {
     	return 1;

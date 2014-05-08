@@ -65,18 +65,20 @@ size_t *count_frequency(FILE *file) {
 
 
 Node *make_list(size_t *table) {
-	Node *head = create_node(0,-1);
+	Node *head = NULL;
     int i;
 
     for(i = 0; i < ALPHABET; i++) {
         if (table[i] != 0) {
-            if(head->weight == -1) {
+            if(head == NULL) {
+				//fprintf(stderr, "%d", table[i]);
                 head = create_node(i, table[i]);
             } else {
                 insert_node_in_list(head, create_node(i, table[i]));
             }
         }
     }
+
     return head;
 }
 
@@ -120,5 +122,5 @@ Node *create_huffman_tree(FILE *file) {
 	fprintf(stderr, "Preparing file...");
 	Node *head = make_list(count_frequency(file));
 	fprintf(stderr, "Done\n");
-	return make_huffman_tree(head);
+	return head ? make_huffman_tree(head) : NULL;
 }
