@@ -74,10 +74,12 @@ int main(int argc, char *argv[]) {
 				file = fopen(argv[i], "rb");
 				if(file == NULL) {
 					fprintf(stderr, "Cannot open %s for reading.\n", argv[i]);
+					remove(tmp_name);
 					return 1;
 				}
 				if(write_file(file, argv[i], tmp)) {
 					fprintf(stderr, "Cannot archive %s.", argv[i]);
+					remove(tmp_name);
 					return 1;
 				}
 
@@ -85,6 +87,7 @@ int main(int argc, char *argv[]) {
 					archive = fopen(archivename, "w+b");
 					if(archive == NULL) {
 						fprintf(stderr, "Cannot open %s for writing.\n", archivename);
+						remove(tmp_name);
 						return 1;
 					}
 					rename(tmp_name, archivename);
@@ -92,6 +95,7 @@ int main(int argc, char *argv[]) {
 					archive = fopen(archivename, "r+b");
 					if(archive == NULL) {
 						fprintf(stderr, "Cannot open %s for writing.\n", archivename);
+						remove(tmp_name);
 						return 1;
 					}
 					switch(add_to_archive(tmp, archive)) {

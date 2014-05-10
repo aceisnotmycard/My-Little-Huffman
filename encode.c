@@ -58,16 +58,18 @@ int fwrite_header(Header *header, FILE *file) {
 
 
 void write_tree(Node *head, char **buffer, int *size) {
-    if(head->ch > ALPHABET - 1) {
-        snprintf(*buffer, TREE_HEIGHT, "N");
-        *size += 1;
-        *buffer += 1;
-        write_tree(head->left, buffer, size);
-        write_tree(head->right, buffer, size);
-    } else {
-        snprintf(*buffer, TREE_HEIGHT, "C%c", head->ch);
-        *size += 2;
-        *buffer += 2;
+    if(head != NULL) {
+        if(head->ch > ALPHABET - 1) {
+            snprintf(*buffer, TREE_HEIGHT, "N");
+            *size += 1;
+            *buffer += 1;
+            write_tree(head->left, buffer, size);
+            write_tree(head->right, buffer, size);
+        } else {
+            snprintf(*buffer, TREE_HEIGHT, "C%c", head->ch);
+            *size += 2;
+            *buffer += 2;
+        }
     }
 }
 

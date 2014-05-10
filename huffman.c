@@ -88,6 +88,10 @@ Node *make_huffman_tree(Node *current) {
     branch->left = current;
     current = current->next;
     branch->right = current;
+	//If only one node in list
+	if(branch->right == NULL) {
+		return branch;
+	}
     branch->weight = branch->left->weight + branch->right->weight;
     branch->next = NULL;
     if (current->next == NULL)
