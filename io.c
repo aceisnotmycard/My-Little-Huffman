@@ -1,5 +1,6 @@
 #include "io.h"
 
+
 void check_crc(FILE *archive) {
 	unsigned long long i;
 	unsigned int byte;
@@ -30,6 +31,7 @@ void check_crc(FILE *archive) {
 	fclose(archive);
 }
 
+
 int add_to_archive(FILE *tmp, FILE *archive) {
 	unsigned long long i;
 	int byte;
@@ -56,7 +58,6 @@ int add_to_archive(FILE *tmp, FILE *archive) {
 					fprintf(stderr, "Cannot write %s to tmp", tmp_header->filename);
 					return 1;
 				}
-				//Maybe EOF here?
 				if(fwrite(&byte, sizeof(char), 1, tmp) != 1) {
 					fprintf(stderr, "Cannot write %s to tmp", tmp_header->filename);
 					return 1;

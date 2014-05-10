@@ -1,6 +1,7 @@
 #ifndef __DECODE_H__
 #define __DECODE_H__
 
+
 #include "huffman.h"
 #include "common.h"
 
@@ -8,7 +9,9 @@
 //Reading 2, 4, 8 bytes from file to variable
 int fread16(unsigned short int *variable, FILE *file);
 
+
 int fread32(unsigned int *variable, FILE *file);
+
 
 int fread64(unsigned long long *variable, FILE *file);
 
@@ -29,5 +32,6 @@ int read_symbols(FILE *archive, FILE *output, Node *head, unsigned long long siz
 //output should be null pointer;
 //Assuming that archive is correct
 int read_archive(FILE *archive, FILE *output, Header *header);
+
 
 #endif

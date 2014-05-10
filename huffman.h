@@ -1,9 +1,11 @@
 #ifndef __HUFFMAN_H__
 #define __HUFFMAN_H__
 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 
 #define ALPHABET 256
 #define TREE_HEIGHT 100
@@ -55,6 +57,5 @@ void create_coding_table(Node *node, char *prev, Code *table);
 //General functions
 Node *create_huffman_tree(FILE *file);
 
-//Debugging functions
 
 #endif

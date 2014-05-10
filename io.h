@@ -1,11 +1,14 @@
 #ifndef __IO_H__
 #define __IO_H__
 
+
 #include "encode.h"
 #include "decode.h"
 
+
 //Checking crc32 sum of array
 void check_crc(FILE *archive);
+
 
 //Adding new file to array.
 //Assuming that everything is ok.
@@ -21,5 +24,6 @@ int extract_all(FILE *archive);
 
 
 int delete_from_archive(char *name, FILE *archive, FILE *tmp);
+
 
 #endif

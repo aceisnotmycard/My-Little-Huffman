@@ -1,6 +1,7 @@
 #include <sys/stat.h>
 #include "io.h"
 
+
 typedef enum {
 	ARCHIVE = 0,
 	LIST,
@@ -10,7 +11,9 @@ typedef enum {
 	HELP
 } Mode;
 
+
 Mode parse_input(char *argument);
+
 
 const char* help_message =  "Usage: mylihaf -mode archive_name {files}\n"
 		   				"modes:\n"
@@ -19,6 +22,7 @@ const char* help_message =  "Usage: mylihaf -mode archive_name {files}\n"
 		   				"-l (list) + 0 files\n"
 						   "-t (check crc32 sum) + 0 files\n"
 						   "-d (delete) + 1 file";
+
 
 int main(int argc, char *argv[]) {
 
@@ -215,6 +219,7 @@ int main(int argc, char *argv[]) {
 	}
 	return 0;
 }
+
 
 Mode parse_input(char *argument) {
 	if(!strcmp(argument, "-a")) {

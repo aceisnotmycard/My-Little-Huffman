@@ -74,7 +74,6 @@ void write_tree(Node *head, char **buffer, int *size) {
 }
 
 
-
 int fwrite_symbol(Code symbol, FILE *file, char *byte, int *count, unsigned long long *size, uint32_t *crc) {
     int  cursor = 0;
     while (cursor < symbol.size) {
@@ -97,6 +96,7 @@ int fwrite_symbol(Code symbol, FILE *file, char *byte, int *count, unsigned long
     return 0;
 }
 
+
 int write_file(FILE *file, char *filename, FILE *archive) {
     int ch;
     int length = 0;
@@ -117,8 +117,6 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     Node *head = create_huffman_tree(file);
     Header *header = malloc(sizeof(Header));
 
-    //fprintf(stderr, "Error is not here\n");
-
     if(head) {
         create_coding_table(head, "", table);
         write_tree(head, &p, &length);
@@ -130,13 +128,6 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     header->crc = 0;
     header->originalsize = original_size;
     header->filesize = 0;
-
-
-
-    //fprintf(stderr, "filename: %s\n", header->filename);
-    //fprintf(stderr, "namesize: %d\n", header->namesize);
-    //fprintf(stderr, "tree: %s\n", header->tree);
-    // fprintf(stderr, "filesize: %llu\n", header->filesize);
 
     if (fwrite_header(header, archive)) {
     	return 1;
@@ -165,7 +156,5 @@ int write_file(FILE *file, char *filename, FILE *archive) {
     	return 1;
     }
     fprintf(stderr, "\nDone\n");
-    //fprintf(stderr, "%s\n", header->tree);
-    //fprintf(stderr, "%llu\n", header->filesize);
     return 0;
 }

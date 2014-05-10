@@ -1,8 +1,10 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+
 #include <stdint.h>
 #include <stdio.h>
+
 
 //ORDER IN HEADER
 //NAMESIZE
@@ -35,10 +37,13 @@ static char TAB[] = {
     0x80 //10000000
 };
 
+
 //Generating crc sum
 uint32_t crc32(uint32_t crc, unsigned char buf);
 
+
 //Showing percentage
 void show_progress(unsigned long long i, unsigned long long size);
+
 
 #endif

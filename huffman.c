@@ -1,7 +1,6 @@
 #include "huffman.h"
 
 
-//Function for make_list
 Node *create_node(int ch, size_t weight) {
 	Node *result = (Node *) malloc(sizeof(Node));
 	result->ch = ch;
@@ -71,7 +70,6 @@ Node *make_list(size_t *table) {
     for(i = 0; i < ALPHABET; i++) {
         if (table[i] != 0) {
             if(head == NULL) {
-				//fprintf(stderr, "%d", table[i]);
                 head = create_node(i, table[i]);
             } else {
                 insert_node_in_list(head, create_node(i, table[i]));

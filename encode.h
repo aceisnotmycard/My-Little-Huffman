@@ -1,6 +1,7 @@
 #ifndef __ENCODE_H__
 #define __ENCODE_H__
 
+
 #include "huffman.h"
 #include "common.h"
 
@@ -26,5 +27,6 @@ int fwrite_symbol(Code symbol, FILE *file, char *byte, int *count, unsigned long
 //Compressing filename to archivename
 //Assuming that filenames are correct
 int write_file(FILE *file, char *filename, FILE *archive);
+
 
 #endif

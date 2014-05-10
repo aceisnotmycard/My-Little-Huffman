@@ -46,7 +46,6 @@ int fread64(unsigned long long *variable, FILE *file) {
 }
 
 
-//REFACTOR
 int fread_header(Header *header, FILE *file) {
     int i = 0;
     unsigned int *namesize = malloc(sizeof(unsigned int));
@@ -108,25 +107,13 @@ void read_tree(Node **head, char **buffer) {
    }
 }
 
-void print_tree(Node *head) {
-    if(head != NULL) {
-        fprintf(stderr, "%c", head->ch);
-        print_tree(head->left);
-        print_tree(head->right);
-    }
-}
 
 int read_archive(FILE *archive, FILE *output, Header *header) {
     unsigned long long i;
     Node *head = create_node(ALPHABET, 0);
     char byte;
 
-    //fprintf(stderr, "%s\n", header->tree);
-    //fprintf(stderr, "%llu\n", header->filesize);
-
     read_tree(&head, &header->tree);
-
-    //print_tree(head);
 
     output = fopen(header->filename, "wb");
 
@@ -156,5 +143,6 @@ int read_archive(FILE *archive, FILE *output, Header *header) {
         show_progress(i, header->filesize);
     }
     fprintf(stderr, "\n");
+    
     return 0;
 }

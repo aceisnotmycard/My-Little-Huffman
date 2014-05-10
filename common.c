@@ -1,5 +1,6 @@
 #include "common.h"
 
+
 static uint32_t crc32_tab[] = {
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
     0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
@@ -46,10 +47,12 @@ static uint32_t crc32_tab[] = {
     0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
+
 uint32_t crc32(uint32_t crc, unsigned char buf) {
     crc = (crc >> 8) ^ crc32_tab[(crc ^ buf) & 0xFF];
     return crc ^ 0xFFFFFFFF;
 }
+
 
 void show_progress(unsigned long long i, unsigned long long size) {
     if ((int) 80 * (i+1)/size > (int) 80 * i/size) {
