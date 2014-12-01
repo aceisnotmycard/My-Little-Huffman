@@ -7,14 +7,14 @@ void check_crc(FILE *archive) {
 	uint32_t crc;
 
 	Header *header = malloc(sizeof(Header));
-	while(!fread_header(header, archive)) {
+	while (!fread_header(header, archive)) {
 		crc = 0xFFFFFFFF;
 		fprintf(stderr, "Checking... %s\n", header->filename);
-		for(i = 0; i < header->filesize; i++) {
-			if(i % 8 == 0) {
+		for (i = 0; i < header->filesize; i++) {
+			if (i % 8 == 0) {
 				fread(&byte, sizeof(char), 1, archive);
 				crc = crc32(crc, byte);
-				if(byte == EOF) {
+				if (byte == EOF) {
 					fprintf(stderr, "ERROR\n");
 					return;
 				}
